@@ -1,7 +1,7 @@
 ######################
 # INSTALLATION STAGE #
 ######################
-FROM ubuntu:16.04 as builder
+FROM ubuntu:18.04 as builder
 
 ARG USER=was
 ARG GROUP=was
@@ -42,7 +42,7 @@ RUN echo "📥 Installing WebSphere Application Server 7.0 Updates..." \
 ##########################
 # PROFILE CREATION STAGE #
 ##########################
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 LABEL maintainer="Pei-Tang Huang <beta@cht.com.tw>"
 
