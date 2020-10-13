@@ -1,0 +1,1 @@
+docker image build -t websphere:7.0.0.45 .
