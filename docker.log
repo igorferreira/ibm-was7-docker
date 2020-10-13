@@ -1,0 +1,145 @@
+docker image build -t websphere:7.0.0.45 .
+Sending build context to Docker daemon  1.766GB
+Step 1/33 : FROM ubuntu:18.04 as builder
+18.04: Pulling from library/ubuntu
+171857c49d0f: Pull complete 
+419640447d26: Pull complete 
+61e52f862619: Pull complete 
+Digest: sha256:646942475da61b4ce9cc5b3fadb42642ea90e5d0de46111458e100ff2c7031e6
+Status: Downloaded newer image for ubuntu:18.04
+ ---> 56def654ec22
+Step 2/33 : ARG USER=was
+ ---> Running in 66a696a4d633
+Removing intermediate container 66a696a4d633
+ ---> ca875080b036
+Step 3/33 : ARG GROUP=was
+ ---> Running in 3daea5eb2b79
+Removing intermediate container 3daea5eb2b79
+ ---> e4643fb75618
+Step 4/33 : COPY source /work/source
+ ---> 392da0367fbb
+Step 5/33 : COPY update /work/update
+ ---> ab54b37566f3
+Step 6/33 : COPY responsefile /work/responsefile
+ ---> f1d311dbbb44
+Step 7/33 : RUN groupadd $GROUP   && useradd $USER -g $GROUP -m   && chown -R $USER:$GROUP /work /opt
+ ---> Running in 612efa4bdfea
+Removing intermediate container 612efa4bdfea
+ ---> f6dc73b7e658
+Step 8/33 : USER $USER
+ ---> Running in dc29507607bb
+Removing intermediate container dc29507607bb
+ ---> dfa605f32c59
+Step 9/33 : RUN echo "📦 Unarchiving WebSphere Application Server 7.0 installation package..."   && mkdir -p /work/was   && tar -xzf /work/source/was.7000.wasdev.nocharge.linux.amd64.tar.gz -C /work/was/   && echo "☑ Done."
+ ---> Running in a961db167cf3
+📦 Unarchiving WebSphere Application Server 7.0 installation package...
+☑ Done.
+Removing intermediate container a961db167cf3
+ ---> e8c44032559f
+Step 10/33 : RUN echo "📥 Installing WebSphere Application Server 7.0..."   && /work/was/WAS/install -options /work/responsefile/responsefile.text -silent   && echo "☑ Done."
+ ---> Running in 0c80799b2f9a
+📥 Installing WebSphere Application Server 7.0...
+☑ Done.
+Removing intermediate container 0c80799b2f9a
+ ---> fc35d3cb8250
+Step 11/33 : RUN echo "📦 Unarchiving WebSphere Application Server 7.0 Update Installer intallation package..."   && mkdir -p /work/updi   && tar -xzf /work/source/7.0.0.*-WS-UPDI-LinuxAMD64.tar.gz -C /work/updi/   && echo "☑ Done."
+ ---> Running in 243db90510f1
+📦 Unarchiving WebSphere Application Server 7.0 Update Installer intallation package...
+☑ Done.
+Removing intermediate container 243db90510f1
+ ---> e878e75c7aa0
+Step 12/33 : RUN echo "📥 Installing WebSphere Application Server 7.0 Update Installer..."   && /work/updi/UpdateInstaller/install -options /work/responsefile/responsefile.updateinstaller.text -silent   && echo "☑ Done."
+ ---> Running in 38e3bfb4b766
+📥 Installing WebSphere Application Server 7.0 Update Installer...
+☑ Done.
+Removing intermediate container 38e3bfb4b766
+ ---> 89990069b8ed
+Step 13/33 : RUN echo "📥 Installing WebSphere Application Server 7.0 Updates..."   && /opt/IBM/WebSphere/UpdateInstaller/update.sh -options /work/responsefile/responsefile.update.text -silent   && echo "☑ Done."
+ ---> Running in 92975f4fbfbb
+📥 Installing WebSphere Application Server 7.0 Updates...
+
+Executing command: /opt/IBM/WebSphere/UpdateInstaller/java/jre/bin/java -cp /opt/IBM/WebSphere/UpdateInstaller/update.jar -Xms48m -Xmx384m run -options /work/responsefile/responsefile.update.text -silent
+
+☑ Done.
+Removing intermediate container 92975f4fbfbb
+ ---> fc230b2efc6c
+Step 14/33 : FROM ubuntu:18.04
+ ---> 56def654ec22
+Step 15/33 : LABEL maintainer="Pei-Tang Huang <beta@cht.com.tw>"
+ ---> Running in 919f06556587
+Removing intermediate container 919f06556587
+ ---> 15279ea83806
+Step 16/33 : ARG USER=was
+ ---> Running in c4a8fb2349ca
+Removing intermediate container c4a8fb2349ca
+ ---> 0df223317ef7
+Step 17/33 : ARG GROUP=was
+ ---> Running in 29a4b042fe62
+Removing intermediate container 29a4b042fe62
+ ---> 4969344a28bd
+Step 18/33 : ARG PROFILE_NAME=AppSrv01
+ ---> Running in 66bc873b5f3e
+Removing intermediate container 66bc873b5f3e
+ ---> d3ccf3f868dc
+Step 19/33 : ARG CELL_NAME=DefaultCell01
+ ---> Running in 858b6acf0927
+Removing intermediate container 858b6acf0927
+ ---> dc2a9c5564e3
+Step 20/33 : ARG NODE_NAME=DefaultNode01
+ ---> Running in 3a44a865bd1c
+Removing intermediate container 3a44a865bd1c
+ ---> d91fee2a7a6f
+Step 21/33 : ARG HOST_NAME=localhost
+ ---> Running in 1d8fc767e6b9
+Removing intermediate container 1d8fc767e6b9
+ ---> eb9fed01f041
+Step 22/33 : ARG SERVER_NAME=server1
+ ---> Running in 4178f4ff5066
+Removing intermediate container 4178f4ff5066
+ ---> 4abbb165f4bb
+Step 23/33 : ENV PROFILE_NAME=$PROFILE_NAME   SERVER_NAME=$SERVER_NAME   ADMIN_USER_NAME=$ADMIN_USER_NAME
+ ---> Running in bf2647f26210
+Removing intermediate container bf2647f26210
+ ---> 0999ab6d1de3
+Step 24/33 : COPY --from=builder /opt /opt
+ ---> d3bfc9b40102
+Step 25/33 : COPY script /work/script
+ ---> 136c74bd3542
+Step 26/33 : RUN yes n | dpkg-reconfigure dash > /dev/null 2>&1
+ ---> Running in 7a8c91035af8
+Removing intermediate container 7a8c91035af8
+ ---> 845dea7046dd
+Step 27/33 : RUN groupadd $GROUP   && useradd $USER -g $GROUP -m   && chown -R $USER:$GROUP /work /opt
+ ---> Running in 7cb77de4194b
+Removing intermediate container 7cb77de4194b
+ ---> 154450ec3f1e
+Step 28/33 : USER $USER
+ ---> Running in 8d832aa7269a
+Removing intermediate container 8d832aa7269a
+ ---> 2f1feceb2a6d
+Step 29/33 : RUN sed -i 's#<action path="actions/createProfileShortCut2StartMenuDefault.ant" priority="93" isFatal="false">#<action path="actions/createProfileShortCut2StartMenuDefault.ant" priority="93" isFatal="false" isOptional="true">#'   /opt/IBM/WebSphere/AppServer/profileTemplates/default/actionRegistry.xml
+ ---> Running in ac7c3d24b035
+Removing intermediate container ac7c3d24b035
+ ---> 7131f4223350
+Step 30/33 : RUN /work/script/create_profile.sh
+ ---> Running in 57a6e7caf9aa
+Creating profile ....................
+Oct 13, 2020 2:10:23 AM java.util.prefs.FileSystemPreferences$2 run
+INFO: Created user preferences directory.
+INSTCONFSUCCESS: Success: Profile AppSrv01 now exists. Please consult /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/logs/AboutThisProfile.txt for more information about this profile.
+Removing intermediate container 57a6e7caf9aa
+ ---> c336c1ab8a7a
+Step 31/33 : ENV PATH /opt/IBM/WebSphere/AppServer/bin:$PATH
+ ---> Running in e39bbcccc422
+Removing intermediate container e39bbcccc422
+ ---> 3fb5ebd25f0e
+Step 32/33 : EXPOSE 8880 9060 9080
+ ---> Running in e3edab8059a0
+Removing intermediate container e3edab8059a0
+ ---> ce494ba76b92
+Step 33/33 : CMD ["/work/script/start_server.sh"]
+ ---> Running in 51b47aa0a118
+Removing intermediate container 51b47aa0a118
+ ---> 9a4a9cab023e
+Successfully built 9a4a9cab023e
+Successfully tagged websphere:7.0.0.45
