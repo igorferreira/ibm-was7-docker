@@ -75,3 +75,17 @@ In the container's shell interpretor, you can access WebSphere Application Serve
 ```bash
 wsadmin.sh -lang jython -javaoption "-Dfile.encoding=UTF-8" -f my_admin_script.py
 ```
+
+### Docker deamin dns config
+
+Edit daemon.json to include dns for conteiner can internet access
+
+```bash
+cat /etc/docker/daemon.json
+```
+
+```json
+{
+    "dns": ["1.1.1.1", "8.8.8.8"]
+}
+```
